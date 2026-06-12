@@ -8,8 +8,8 @@ from streamlit_gsheets import GSheetsConnection
 # CONFIGURAÇÃO DA PÁGINA
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="Gestão de Pedidos - Açougue Especial",
-    page_icon="🍗",
+    page_title="Gestão de Pedidos - Matéria Prima",
+    page_icon="📦",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -17,11 +17,11 @@ st.set_page_config(
 # ─────────────────────────────────────────────
 # INICIALIZAÇÃO DE VARIÁVEIS DE SESSÃO
 # ─────────────────────────────────────────────
-if 'reset_counter_acougue_especial' not in st.session_state:
-    st.session_state['reset_counter_acougue_especial'] = 0
+if 'reset_counter_materia_prima' not in st.session_state:
+    st.session_state['reset_counter_materia_prima'] = 0
 
-if 'usuario_logado_acougue_especial' not in st.session_state:
-    st.session_state['usuario_logado_acougue_especial'] = None
+if 'usuario_logado_materia_prima' not in st.session_state:
+    st.session_state['usuario_logado_materia_prima'] = None
 
 # ─────────────────────────────────────────────
 # CSS GLOBAL E DE IMPRESSÃO (PALETA VERMELHA)
@@ -272,39 +272,151 @@ LOJAS = ["Loja 01", "Loja 02", "Loja 03", "Loja 04", "Loja 05", "Loja 06", "Loja
 MAPA_LOJAS = {l: l for l in LOJAS}
 
 produtos_iniciais = [
-    {"Fornecedor": "PIONEIRO", "Código": 655527, "Descrição Oficial": "Coracao Frango 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655518, "Descrição Oficial": "Coxa Frango 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655509, "Descrição Oficial": "Coxa Sobrecoxa 500g Pioneiro S/Osso S/Pele Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655590, "Descrição Oficial": "Coxinha Asa 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655493, "Descrição Oficial": "Figado Frango 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655350, "Descrição Oficial": "File Peito 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655369, "Descrição Oficial": "File Sassami 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655606, "Descrição Oficial": "Frango Passarinho 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655341, "Descrição Oficial": "Meio Asa 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655332, "Descrição Oficial": "Moela Frango 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "PIONEIRO", "Código": 655323, "Descrição Oficial": "Sobrecoxa 500g Pioneiro Bdj Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "FRANGO PARANÁ", "Código": 139773, "Descrição Oficial": "Pe Frango Kg Bdj", "Nome Personalizado": ""},
-    {"Fornecedor": "FRANGO PARANÁ", "Código": 140982, "Descrição Oficial": "Dorso Kg", "Nome Personalizado": ""},
-    {"Fornecedor": "FRANGO PARANÁ", "Código": 379043, "Descrição Oficial": "Peito Frango Kg Parana", "Nome Personalizado": ""},
-    {"Fornecedor": "FRANGO PARANÁ", "Código": 82679,  "Descrição Oficial": "Frango Kg Parana", "Nome Personalizado": ""},
-    {"Fornecedor": "FRANGO PARANÁ", "Código": 526748, "Descrição Oficial": "Pescoco Frango Kg", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - TEMPERADOS", "Código": 48323,  "Descrição Oficial": "Coxinha Asa Temp Kg Big", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - TEMPERADOS", "Código": 20350,  "Descrição Oficial": "Frango Pass Temp Kg Big", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - TEMPERADOS", "Código": 48330,  "Descrição Oficial": "Meio Asa Temp Kg Big", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - TEMPERADOS", "Código": 168951, "Descrição Oficial": "Sobrecoxa Temp Kg Big", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BANDEJAS", "Código": 352259, "Descrição Oficial": "Coxa Frango Kg Big Band Padrao Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BANDEJAS", "Código": 352161, "Descrição Oficial": "Coxa Sobrecoxa Kg Big Band Padrao Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BANDEJAS", "Código": 352213, "Descrição Oficial": "Coxinha Asa Kg Big Band Padrao Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BANDEJAS", "Código": 352204, "Descrição Oficial": "File Peito Kg Big Band Padrao Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BANDEJAS", "Código": 352240, "Descrição Oficial": "File Sassami Kg Big Band Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BANDEJAS", "Código": 352189, "Descrição Oficial": "Meio Asa Kg Big Band Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BANDEJAS", "Código": 352268, "Descrição Oficial": "Moela Kg Big Band Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BANDEJAS", "Código": 352222, "Descrição Oficial": "Peito Frango Kg Big Band Padrao Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BANDEJAS", "Código": 352170, "Descrição Oficial": "Sobrecoxa Kg Big Band Padrao Resf", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BALCÃO", "Código": 75305, "Descrição Oficial": "Coxa Sobrecoxa Kg Big", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BALCÃO", "Código": 18005, "Descrição Oficial": "Coxinha Asa Kg Big", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX BALCÃO", "Código": 75343, "Descrição Oficial": "File Peito Kg Big", "Nome Personalizado": ""},
-    {"Fornecedor": "BIG FRANGO - MIX CONGELADO", "Código": 548236, "Descrição Oficial": "Sambiquira Frango 1kg Big Frango", "Nome Personalizado": ""},
+    # MATÉRIA PRIMA GERAL
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 651017, "Descrição Oficial": "Abacaxi Calda 400g Tozzi Rodelas", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 6846, "Descrição Oficial": "Acucar Cristal 5kg Alto Alegre", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 594624, "Descrição Oficial": "Acucar Mascavo 500g Dacolonia", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 22545, "Descrição Oficial": "Acucar Refinado 5kg Alto Alegre", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 630591, "Descrição Oficial": "Alga Marinha 22g Tokyofoods Yakinori C/10", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 596020, "Descrição Oficial": "Amendoim 400g Caldo Bom Branco", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 34067, "Descrição Oficial": "Arroz 5kg Frias Extra Tp1", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 558057, "Descrição Oficial": "Atum Ralado 140g Pescador Oleo", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 558048, "Descrição Oficial": "Atum Solido 140g Pescador Oleo", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 188593, "Descrição Oficial": "Azeit Verde Fatiada 1,010kg Atalaia Sache", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 144216, "Descrição Oficial": "Azeite Oliva 500ml Borges Ex Virgem", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 451967, "Descrição Oficial": "Batata Palha 1kg Vo Maria", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 651390, "Descrição Oficial": "Bisc Maizena 300g Marilan", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 291, "Descrição Oficial": "Bombom Wafer Ouro Branco 1kg", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 284, "Descrição Oficial": "Bombom Wafer Sonho Valsa 1kg", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 226200, "Descrição Oficial": "Cafe 500g Bom Jesus Tradicional Vac", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 567107, "Descrição Oficial": "Caldo 1,01kg Apti Carne", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 639334, "Descrição Oficial": "Caldo 1,010kg Soeto Galinha", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 8604, "Descrição Oficial": "Canjiquinha 500g Zaeli", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 52498, "Descrição Oficial": "Cevada 500g Boa Saude Gold", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 217390, "Descrição Oficial": "Cha Mate 250g Leao", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 318839, "Descrição Oficial": "Champignon Fatiado 1,010kg Atalaia Sache", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 77712, "Descrição Oficial": "Choc 33g Nestle Prestigio", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 592316, "Descrição Oficial": "Choc 80g Lacta Laka", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 658269, "Descrição Oficial": "Choc 80g Nestle Alpino", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 611091, "Descrição Oficial": "Choc Wafer Bis 100,8g Lacta C16 Ao Leite", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 609713, "Descrição Oficial": "Choc Wafer Bis 100,8g Lacta C16 Laka", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 6226, "Descrição Oficial": "Conhaque 900ml Presidente", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 204998, "Descrição Oficial": "Ameixa Seca 100g La Violetera S/Caroco", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 450816, "Descrição Oficial": "Far Trigo Integral 1kg Arapongas", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 639370, "Descrição Oficial": "Creme Cebola 1,010kg Soeto", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 28325, "Descrição Oficial": "Creme Leite 200g Lider Tp", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 625058, "Descrição Oficial": "Ervilha 1,7kg Ole Lata", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 633491, "Descrição Oficial": "Extr Tom 1,020kg Ole Sache", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 526508, "Descrição Oficial": "Far Milho 1kg Caldo Bom Amarela", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 6837, "Descrição Oficial": "Far Trigo 5kg Arapongas", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 435242, "Descrição Oficial": "Cons Far Trigo 5kg Coamo", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 3292, "Descrição Oficial": "Farofa Mand 500g Zaeli Tradicional", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 516981, "Descrição Oficial": "Feijao Carioca 1kg Caldo Bom", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 516990, "Descrição Oficial": "Feijao Preto 1kg Caldo Bom", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 579430, "Descrição Oficial": "Figo Calda 400g Citral Inteiros", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 3326, "Descrição Oficial": "Fuba 1kg Joia", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584575, "Descrição Oficial": "Gelatina 20g Apti Abacaxi", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584584, "Descrição Oficial": "Gelatina 20g Apti Cereja", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584593, "Descrição Oficial": "Gelatina 20g Apti Limao", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584609, "Descrição Oficial": "Gelatina 20g Apti Maracuja", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584618, "Descrição Oficial": "Gelatina 20g Apti Morango", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584627, "Descrição Oficial": "Gelatina 20g Apti Uva", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 47722, "Descrição Oficial": "Gelatina Incolor 24g Apti S/Sabor", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 647467, "Descrição Oficial": "Grao Bico 400g Pinduca", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 27403, "Descrição Oficial": "Ketchup 3,4kg Calcuta", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 474977, "Descrição Oficial": "Leite Coco 500ml Adel Coco Vidro", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 4972, "Descrição Oficial": "Leite l Vida 1l Lider Integral", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 301699, "Descrição Oficial": "Leite Po 400g Piracanjuba Instantaneo", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 38805, "Descrição Oficial": "Mac Sem 500g Floriani Penne", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 30526, "Descrição Oficial": "Mac Trad 500g Floriani Espaguete", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 34494, "Descrição Oficial": "Mac Trad 500g Floriani Parafuso", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 251127, "Descrição Oficial": "Maionese 3kg Dajuda Bag", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 21067, "Descrição Oficial": "Maria Mole 50g Apti Coco", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 575461, "Descrição Oficial": "Mel 280g Sendeski Silvestre", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 521178, "Descrição Oficial": "Milho Verde 1,7kg Predilecta Lata", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 65511, "Descrição Oficial": "Molho Shoyu 900ml Kirin Tradicional", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 475587, "Descrição Oficial": "Molho Tom 1,020kg Sc Tarantella Trad", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 103848, "Descrição Oficial": "Mostarda 3,2kg Calcuta", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 364908, "Descrição Oficial": "Oleo Comp 500ml Maria Trad Pet", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 31431, "Descrição Oficial": "Oleo Soja 900ml Coamo", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 130967, "Descrição Oficial": "Palmito Picado Palm Real 1.8kg Rio Cerro", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 252463, "Descrição Oficial": "Pessego Calda 450g Schramm Extra", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 607609, "Descrição Oficial": "Queijo Ral Grosso 40g Floriani", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 594138, "Descrição Oficial": "Ref 18g Tang Nutri Laranja", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584779, "Descrição Oficial": "Ref 18g Tang Nutri Limao", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584788, "Descrição Oficial": "Ref 18g Tang Nutri Maracuja", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584760, "Descrição Oficial": "Ref 18g Tang Nutri Morango", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 584803, "Descrição Oficial": "Ref 18g Tang Nutri Uva", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 649270, "Descrição Oficial": "Sagu 400g Pinduca", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 653796, "Descrição Oficial": "Sal Grosso P/Churrasco 1kg Marfim", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 653787, "Descrição Oficial": "Sal Refinado 1kg Marfim", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 4194, "Descrição Oficial": "Temp 100g Ajinomoto Refil", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 4404, "Descrição Oficial": "Temp 60g Sazon Frango", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 4413, "Descrição Oficial": "Temp 60g Sazon Legumes", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 347558, "Descrição Oficial": "Temp 60g Sazon Limao", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 197795, "Descrição Oficial": "Temp 900g Sazon Carnes", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 493130, "Descrição Oficial": "Toalha Pap C2 Tropicos 100 Toalhas", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 338709, "Descrição Oficial": "Vinagre Alcool 750ml Chemim", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 602491, "Descrição Oficial": "Cafe Sol 40g Nescafe Tradicao Ex Forte Sache", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 58902, "Descrição Oficial": "Arroz 5kg Zaeli Agulhinha Tp1", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 628930, "Descrição Oficial": "Fosforo Parana Gigante Eco C/50", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 69663, "Descrição Oficial": "Mac Inst Yakissoba 500g Nissin", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 640640, "Descrição Oficial": "Papel Alum Life Clean 45cmx7,5m", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 461797, "Descrição Oficial": "Sabao Barra 800g Alpes Super", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 50999, "Descrição Oficial": "Saco Lixo Sert Rolo 30l C/30", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 50982, "Descrição Oficial": "Saco Lixo Sert Rolo 15l C/60", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 326865, "Descrição Oficial": "Saponaceo Crem 450ml Cif Original", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 44349, "Descrição Oficial": "Vinagre Arroz 750ml Castelo", "Nome Personalizado": ""},
+    {"Fornecedor": "MATÉRIA PRIMA GERAL", "Código": 587314, "Descrição Oficial": "Espeto Bambu Bompack 25cm C/50", "Nome Personalizado": ""},
+
+    # USO DE PRODUTOS LIMPEZA
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 1133, "Descrição Oficial": "Agua Sanitaria 1l Qboa", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 623014, "Descrição Oficial": "Brilha Alum 500ml Provita Inox Original", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 158088, "Descrição Oficial": "Copo Desc C100 Coposul 180ml Transp", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 158103, "Descrição Oficial": "Copo Desc C100 Coposul 50ml Transp", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 168243, "Descrição Oficial": "Desinf L500p450ml Pinho Brill Silvestre Orig", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 178, "Descrição Oficial": "Deterg Liq 500ml Ype Neutro", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 373331, "Descrição Oficial": "Esponja C4 Brilhus Multiuso Preço Economica", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 422956, "Descrição Oficial": "Flanela Martimpanos 28x28 Ouro", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 265333, "Descrição Oficial": "Lamina C3 Fiat Lux Flexor", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 205313, "Descrição Oficial": "Limp 500ml m Uso 3x1 Facille Tradicional", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 38485, "Descrição Oficial": "Palha Aco 25g Brillo N01", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 1063, "Descrição Oficial": "Palito Dente C200 Gina", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 491910, "Descrição Oficial": "Pano Microfibra Martimpanos 50x70 Azul", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 604541, "Descrição Oficial": "Pano Microfibra Martimpanos 80x90cm Verde", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 464679, "Descrição Oficial": "Querosene 800ml Petrus", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 556721, "Descrição Oficial": "Sabao Po 800g Tixan Primavera", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 414717, "Descrição Oficial": "Saneante Desinf Hospitalar 1l Araucaria 70", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 53174, "Descrição Oficial": "Vassoura Alklin Multiuso C/Cabo", "Nome Personalizado": ""},
+    {"Fornecedor": "USO DE PRODUTOS LIMPEZA", "Código": 419925, "Descrição Oficial": "Saco Martimpanos Alvejado 40x62 Branco", "Nome Personalizado": ""},
+
+    # TEMPEROS
+    {"Fornecedor": "TEMPEROS", "Código": 1656, "Descrição Oficial": "Colorau 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 574675, "Descrição Oficial": "Cons Acafrao 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 588030, "Descrição Oficial": "Cons Alho Granulado 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 490300, "Descrição Oficial": "Cons Amac Carne 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 257769, "Descrição Oficial": "Cons Canela Moida 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 594767, "Descrição Oficial": "Cons Cebolinha Desidr 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 558464, "Descrição Oficial": "Cons Chimichurri 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 574693, "Descrição Oficial": "Cons Cominho Em Pó 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 574718, "Descrição Oficial": "Cons Curry 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 398419, "Descrição Oficial": "Cons Erva Doce 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 588049, "Descrição Oficial": "Cons Lemon Pepper 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 574736, "Descrição Oficial": "Cons Louro Em Pó 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 575249, "Descrição Oficial": "Cons Noz Moscada Moida 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 263478, "Descrição Oficial": "Cons Oregano 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 574745, "Descrição Oficial": "Cons Paprica Defumada 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 574754, "Descrição Oficial": "Cons Paprica Doce 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 98755, "Descrição Oficial": "Cons Paprica Picante 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 499170, "Descrição Oficial": "Cons Pimenta Reino Moida 500g Androinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 574684, "Descrição Oficial": "Cons Salsinha Desidratada 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 490294, "Descrição Oficial": "Cons Tempero Churrasco 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 574709, "Descrição Oficial": "Cons Tempero Sirio 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 574727, "Descrição Oficial": "Cons Tomilho 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 229395, "Descrição Oficial": "Cons Vinagrete 500g Andorinha", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 425467, "Descrição Oficial": "Pimenta Calabresa 20g Andorinha Moida", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 61186, "Descrição Oficial": "Pimenta Calabresa 30g Andorinha Flocos", "Nome Personalizado": ""},
+    {"Fornecedor": "TEMPEROS", "Código": 594758, "Descrição Oficial": "Cons Louro Folhas 200g Andorinha", "Nome Personalizado": ""}
 ]
 
 # ─────────────────────────────────────────────
@@ -312,8 +424,8 @@ produtos_iniciais = [
 # ─────────────────────────────────────────────
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-WS_PRODUTOS = "AcEspeciais_Produtos"
-WS_PEDIDOS  = "AcEspeciais_Pecas"
+WS_PRODUTOS = "MateriaP_Produtos"
+WS_PEDIDOS  = "MateriaP_Pecas"
 
 def parse_bool(x):
     if isinstance(x, bool): return x
@@ -321,7 +433,7 @@ def parse_bool(x):
     return str(x).strip().upper() in ['TRUE', 'VERDADEIRO', '1', 'V', 'SIM', 'YES', 'T', 'X']
 
 @st.cache_data(ttl=15)
-def carregar_catalogo_acougue():
+def carregar_catalogo_materia():
     try:
         df = conn.read(worksheet=WS_PRODUTOS, ttl=0, usecols=list(range(20)))
     except ValueError as e:
@@ -396,7 +508,7 @@ def carregar_pedidos():
         st.error(f"Erro ao conectar na aba {WS_PEDIDOS}: {e}")
         st.stop()
 
-    df_cat = carregar_catalogo_acougue()
+    df_cat = carregar_catalogo_materia()
 
     if df_pedidos.empty or "Código" not in df_pedidos.columns:
         df_init = df_cat[["Fornecedor", "Código", "Descrição"]].copy()
@@ -430,7 +542,7 @@ def salvar_catalogo(df_to_save):
 # ─────────────────────────────────────────────
 # SISTEMA DE LOGIN
 # ─────────────────────────────────────────────
-if st.session_state['usuario_logado_acougue_especial'] is None:
+if st.session_state['usuario_logado_materia_prima'] is None:
     st.write("<br><br>", unsafe_allow_html=True)
     _, col2, _ = st.columns([1, 1.4, 1])
     with col2:
@@ -439,14 +551,14 @@ if st.session_state['usuario_logado_acougue_especial'] is None:
             with h1:
                 st.markdown("""
                     <h2 style='margin-bottom:0'>Portal de Pedidos</h2>
-                    <p style='color:#7d8590;font-size:14px;margin-top:4px'>Açougue Especial — Molicenter</p>
+                    <p style='color:#7d8590;font-size:14px;margin-top:4px'>Matéria Prima — Molicenter</p>
                 """, unsafe_allow_html=True)
             with h2:
                 st.write("")
                 try:
                     st.image("passaro_logo.png", width=60)
                 except Exception:
-                    st.markdown("🍖", unsafe_allow_html=True)
+                    st.markdown("📦", unsafe_allow_html=True)
 
             st.divider()
             usuarios_permitidos = ["Selecione..."] + ["Administrador"] + LOJAS
@@ -460,10 +572,10 @@ if st.session_state['usuario_logado_acougue_especial'] is None:
                 if usuario_selecionado == "Selecione...":
                     st.error("⚠️ Por favor, selecione um usuário.")
                 elif usuario_selecionado == "Administrador" and senha_digitada == "moli0000":
-                    st.session_state['usuario_logado_acougue_especial'] = usuario_selecionado
+                    st.session_state['usuario_logado_materia_prima'] = usuario_selecionado
                     st.rerun()
                 elif usuario_selecionado in LOJAS and senha_digitada == "moli1234":
-                    st.session_state['usuario_logado_acougue_especial'] = usuario_selecionado
+                    st.session_state['usuario_logado_materia_prima'] = usuario_selecionado
                     st.rerun()
                 elif senha_digitada:
                     st.error("⚠️ Senha incorreta. Tente novamente.")
@@ -474,7 +586,7 @@ if st.session_state['usuario_logado_acougue_especial'] is None:
 # ─────────────────────────────────────────────
 # PÓS-LOGIN
 # ─────────────────────────────────────────────
-usuario_atual = st.session_state['usuario_logado_acougue_especial']
+usuario_atual = st.session_state['usuario_logado_materia_prima']
 acesso_total  = usuario_atual == "Administrador"
 
 if not acesso_total:
@@ -493,10 +605,10 @@ with st.sidebar:
     try:
         st.image("passaro_logo.png", width=72)
     except Exception:
-        st.markdown("🍖")
+        st.markdown("📦")
 
     st.markdown(f"### Olá, *{usuario_atual}*")
-    st.caption("Sistema de Pedidos — Açougue Especial")
+    st.caption("Sistema de Pedidos — Matéria Prima")
     st.divider()
 
     if acesso_total:
@@ -523,13 +635,13 @@ with st.sidebar:
 
     if st.button("🔄 Sincronizar Dados", use_container_width=True):
         st.cache_data.clear()
-        st.session_state['reset_counter_acougue_especial'] += 1
+        st.session_state['reset_counter_materia_prima'] += 1
         st.rerun()
 
     st.write("<br>", unsafe_allow_html=True)
 
     if st.button("🚪 Sair / Logout", use_container_width=True):
-        st.session_state['usuario_logado_acougue_especial'] = None
+        st.session_state['usuario_logado_materia_prima'] = None
         st.rerun()
 
 # ─────────────────────────────────────────────
@@ -547,7 +659,7 @@ def modal_zerar_pedidos():
             st.rerun()
     with c2:
         if st.button("✔️ Sim, zerar tudo", type="primary", use_container_width=True):
-            st.session_state['reset_counter_acougue_especial'] += 1
+            st.session_state['reset_counter_materia_prima'] += 1
             df_main = carregar_pedidos()
             for loja in LOJAS:
                 if loja in df_main.columns:
@@ -563,8 +675,8 @@ if perfil_navegacao == "Separação e Fechamento":
     <div class="page-header hide-print" style="background: linear-gradient(90deg, var(--red-dark) 0%, #1a0808 100%); padding: 14px 20px; border-radius: 10px; margin-bottom: 22px;">
         <span style="font-size: 26px; margin-right: 12px;">📊</span>
         <div style="display: inline-block; vertical-align: top;">
-            <div style="font-size: 20px; font-weight: 700; color: var(--text-header);">Separação e Fechamento — Açougue Especial</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Consolidado geral de quantidades por Fornecedor e Código</div>
+            <div style="font-size: 20px; font-weight: 700; color: var(--text-header);">Separação e Fechamento — Matéria Prima</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Consolidado geral de quantidades por Categoria e Código</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -579,7 +691,7 @@ if perfil_navegacao == "Separação e Fechamento":
         df_base["TOTAL GERAL"] = df_base[LOJAS].sum(axis=1)
 
         col_cfg = {
-            "Fornecedor":  st.column_config.TextColumn("Fornecedor", disabled=True),
+            "Fornecedor":  st.column_config.TextColumn("Categoria", disabled=True),
             "Código":      st.column_config.NumberColumn("Cód.", width=80, format="%d", disabled=True),
             "Descrição":   st.column_config.TextColumn("Produto", disabled=True),
             "TOTAL GERAL": st.column_config.NumberColumn("TOTAL ▶️", width=90, format="%d", disabled=True),
@@ -596,13 +708,13 @@ if perfil_navegacao == "Separação e Fechamento":
             use_container_width=True,
             height=600,
             column_config=col_cfg,
-            key=f"sep_editor_{st.session_state['reset_counter_acougue_especial']}"
+            key=f"sep_editor_{st.session_state['reset_counter_materia_prima']}"
         )
 
         html_table = df_editado.to_html(index=False, classes=["print-table", "print-sep"])
         st.markdown(f"""<div id="print-section">
 <h2 style="color: black; margin-bottom: 10px; text-align: center; border-bottom: 2px solid black; padding-bottom: 5px;">
-    Resumo de Separação — Açougue Especial
+    Resumo de Separação — Matéria Prima
 </h2>
 <div class="print-container">
 {html_table}
@@ -622,14 +734,14 @@ if perfil_navegacao == "Separação e Fechamento":
         with col_csv:
             df_csv = df_editado.copy().rename(columns=MAPA_LOJAS)
             csv = df_csv.to_csv(index=False).encode("utf-8")
-            st.download_button("⬇️ CSV", data=csv, file_name="separacao_acougue_especial.csv", mime="text/csv", use_container_width=True)
+            st.download_button("⬇️ CSV", data=csv, file_name="separacao_materia_prima.csv", mime="text/csv", use_container_width=True)
 
         with col_excel:
             buffer = io.BytesIO()
             with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
                 df_exp = df_editado.copy().rename(columns=MAPA_LOJAS)
-                df_exp.to_excel(writer, index=False, sheet_name='Pedidos Acougue Especial')
-            st.download_button("⬇️ Excel", data=buffer.getvalue(), file_name="separacao_acougue_especial.xlsx",
+                df_exp.to_excel(writer, index=False, sheet_name='Pedidos Materia Prima')
+            st.download_button("⬇️ Excel", data=buffer.getvalue(), file_name="separacao_materia_prima.xlsx",
                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                                use_container_width=True)
 
@@ -669,9 +781,9 @@ elif perfil_navegacao == "Visão das Lojas":
         st.markdown(f"""
         <div class="topbar-loja hide-print">
             <div class="topbar-left">
-                <span style="font-size:22px">🍖</span>
+                <span style="font-size:22px">📦</span>
                 <div>
-                    <div class="topbar-title">{loja_selecionada} — Açougue Especial <span class="erp-badge">🟢 Conectado ao ERP</span></div>
+                    <div class="topbar-title">{loja_selecionada} — Matéria Prima <span class="erp-badge">🟢 Conectado ao ERP</span></div>
                     <div class="topbar-sub">Preencha a quantidade de cada produto</div>
                 </div>
             </div>
@@ -680,10 +792,10 @@ elif perfil_navegacao == "Visão das Lojas":
     with col_logout:
         st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
         if st.button("🚪 Sair / Logout", use_container_width=True):
-            st.session_state['usuario_logado_acougue_especial'] = None
+            st.session_state['usuario_logado_materia_prima'] = None
             st.rerun()
 
-    df_cat = carregar_catalogo_acougue()
+    df_cat = carregar_catalogo_materia()
     df_cat_loja = df_cat[df_cat[loja_selecionada] == True].copy()
 
     if df_cat_loja.empty:
@@ -733,7 +845,6 @@ elif perfil_navegacao == "Visão das Lojas":
             df_loja_view["Estoque"] = 0
 
     except Exception as e:
-        # Se a conexão do postgres falhar porque o banco não configurou nos secrets (igual a do gsheets)
         if "No database configured" in str(e) or "missing" in str(e).lower():
              st.error("⚠️ Aviso: As credenciais do banco_erp também precisam estar nos Secrets do Streamlit para puxar o estoque.")
         else:
@@ -748,7 +859,7 @@ elif perfil_navegacao == "Visão das Lojas":
         st.info("💡 **Dica:** O **Estoque** foi preenchido automaticamente com base no sistema ERP. Você pode preencher apenas a **Qtde** do pedido.")
 
         col_cfg_loja = {
-            "Fornecedor": st.column_config.TextColumn("Fornecedor", width=150, disabled=True),
+            "Fornecedor": st.column_config.TextColumn("Categoria", width=150, disabled=True),
             "Código":     st.column_config.NumberColumn("Cód.", width=80, format="%d", disabled=True),
             "Descrição":  st.column_config.TextColumn("Produto", width=250, disabled=True),
             "Estoque":    st.column_config.NumberColumn("📦 Estoque", width=100, format="%d", disabled=True),
@@ -762,7 +873,7 @@ elif perfil_navegacao == "Visão das Lojas":
                 hide_index=True,
                 use_container_width=True,
                 height=520,
-                key=f"loja_acougue_especial_{st.session_state['reset_counter_acougue_especial']}"
+                key=f"loja_materia_prima_{st.session_state['reset_counter_materia_prima']}"
             )
 
         df_imprimir = df_editado.copy()
@@ -821,16 +932,16 @@ elif perfil_navegacao == "Visão das Lojas":
 elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
     st.markdown("""
     <div class="hide-print" style="background: linear-gradient(90deg, var(--red-dark) 0%, #1a0808 100%); padding: 14px 20px; border-radius: 10px; margin-bottom: 22px;">
-        <span style="font-size: 26px; margin-right: 12px;">🍖</span>
+        <span style="font-size: 26px; margin-right: 12px;">📦</span>
         <div style="display: inline-block; vertical-align: top;">
-            <div style="font-size: 20px; font-weight: 700; color: var(--text-header);">Visão por Fornecedor — Açougue Especial</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Resumo consolidado agrupado pelas categorias/fornecedores de produtos</div>
+            <div style="font-size: 20px; font-weight: 700; color: var(--text-header);">Visão por Categoria — Matéria Prima</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Resumo consolidado agrupado pelas categorias de produtos</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     df_all = carregar_pedidos()
-    df_cat = carregar_catalogo_acougue()
+    df_cat = carregar_catalogo_materia()
 
     if df_all.empty or df_cat.empty:
         st.warning("Não há dados de pedidos ou catálogo preenchidos.")
@@ -868,10 +979,10 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
                 with st.container(border=True):
                     st.markdown('<div class="title-input">', unsafe_allow_html=True)
                     st.text_input(
-                        "Fornecedor",
-                        value=f"🍖 {fornecedor}",
+                        "Categoria",
+                        value=f"📦 {fornecedor}",
                         label_visibility="collapsed",
-                        key=f"title_forn_{fornecedor}_{st.session_state['reset_counter_acougue_especial']}"
+                        key=f"title_forn_{fornecedor}_{st.session_state['reset_counter_materia_prima']}"
                     )
                     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -883,7 +994,7 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
                         column_config=col_cfg_forn,
                         height=altura,
                         num_rows="fixed",
-                        key=f"forn_acougue_especial_{fornecedor}_{st.session_state['reset_counter_acougue_especial']}"
+                        key=f"forn_materia_prima_{fornecedor}_{st.session_state['reset_counter_materia_prima']}"
                     )
 
                     total_geral = int(df_forn_edit["TOTAL"].sum()) if "TOTAL" in df_forn_edit.columns else 0
@@ -901,15 +1012,15 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
                                 f"<th>{loja}</th>",
                                 f"<th>{partes[0]}<br>{partes[1]}</th>"
                             )
-                    html_print_content += f"<h3 style='color: black; margin-top: 10px; margin-bottom: 4px;'>🍖 {fornecedor}</h3>\n"
+                    html_print_content += f"<h3 style='color: black; margin-top: 10px; margin-bottom: 4px;'>📦 {fornecedor}</h3>\n"
                     html_print_content += f"{html_table}\n"
-                    html_print_content += f"<div style='text-align:right; font-weight:bold; font-size:11px; margin-top:3px; margin-bottom: 8px; color: black;'>Total do Fornecedor: {total_geral} unidades</div>\n"
+                    html_print_content += f"<div style='text-align:right; font-weight:bold; font-size:11px; margin-top:3px; margin-bottom: 8px; color: black;'>Total da Categoria: {total_geral} unidades</div>\n"
 
         st.write("<br>", unsafe_allow_html=True)
 
     st.markdown(f"""<div id="print-section">
 <h2 style="color: black; margin-bottom: 10px; text-align: center; border-bottom: 2px solid black; padding-bottom: 5px;">
-    Visão por Fornecedor (Resumo) — Açougue Especial
+    Visão por Categoria (Resumo) — Matéria Prima
 </h2>
 <div class="print-container">
 {html_print_content}
@@ -943,13 +1054,13 @@ elif perfil_navegacao == "Catálogo de Produtos":
     <div class="page-header hide-print" style="background: linear-gradient(90deg, var(--red-dark) 0%, #1a0808 100%); padding: 14px 20px; border-radius: 10px; margin-bottom: 22px;">
         <span style="font-size: 26px; margin-right: 12px;">🗂️</span>
         <div style="display: inline-block; vertical-align: top;">
-            <div style="font-size: 20px; font-weight: 700; color: var(--text-header);">Catálogo de Peças e Nomes Oficiais</div>
+            <div style="font-size: 20px; font-weight: 700; color: var(--text-header);">Catálogo de Matéria Prima</div>
             <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Atualize nomes direto do ERP ou crie apelidos personalizados. Os apelidos terão prioridade em todo o sistema.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    df_catalogo = carregar_catalogo_acougue()
+    df_catalogo = carregar_catalogo_materia()
     df_editor_input = df_catalogo.drop(columns=["Descrição"], errors="ignore")
 
     for loja in LOJAS:
@@ -969,16 +1080,13 @@ elif perfil_navegacao == "Catálogo de Produtos":
     with st.container(border=True):
 
         opcoes_forn = [
-            "PIONEIRO",
-            "FRANGO PARANÁ",
-            "BIG FRANGO - TEMPERADOS",
-            "BIG FRANGO - MIX BANDEJAS",
-            "BIG FRANGO - MIX BALCÃO",
-            "BIG FRANGO - MIX CONGELADO",
+            "MATÉRIA PRIMA GERAL",
+            "USO DE PRODUTOS LIMPEZA",
+            "TEMPEROS"
         ]
 
         col_cfg_cat = {
-            "Fornecedor":         st.column_config.SelectboxColumn("Fornecedor", options=opcoes_forn, width=200, required=True),
+            "Fornecedor":         st.column_config.SelectboxColumn("Categoria", options=opcoes_forn, width=200, required=True),
             "Código":             st.column_config.NumberColumn("Cód.", width=80, format="%d", required=True),
             "Descrição Oficial":  st.column_config.TextColumn("Nome Oficial (ERP)", width=280, disabled=False),
             "Nome Personalizado": st.column_config.TextColumn("Nome Personalizado (Apelido)", width=230),
@@ -993,7 +1101,7 @@ elif perfil_navegacao == "Catálogo de Produtos":
             height=600,
             num_rows="dynamic",
             column_config=col_cfg_cat,
-            key=f"editor_catalogo_acougue_especial_{st.session_state['reset_counter_acougue_especial']}"
+            key=f"editor_catalogo_materia_prima_{st.session_state['reset_counter_materia_prima']}"
         )
 
         st.divider()
@@ -1002,7 +1110,7 @@ elif perfil_navegacao == "Catálogo de Produtos":
         with col_atualizar:
             if st.button("💾 Salvar Catálogo", type="primary", use_container_width=True):
                 salvar_catalogo(edited_cat)
-                st.session_state['reset_counter_acougue_especial'] += 1
+                st.session_state['reset_counter_materia_prima'] += 1
                 st.success("✅ Catálogo atualizado com sucesso!")
                 st.rerun()
 
