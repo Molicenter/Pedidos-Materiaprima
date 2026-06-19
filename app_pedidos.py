@@ -241,28 +241,18 @@ div[data-testid="stVerticalBlockBorderWrapper"]:hover {
         -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
     }
 
-    table.print-forn { font-size: 7.5px !important; }
-    table.print-forn th:nth-child(1), table.print-forn td:nth-child(1) { width: 7% !important; text-align: center !important; }
-    table.print-forn th:nth-child(2), table.print-forn td:nth-child(2) { width: 29% !important; text-align: left !important; }
+    table.print-forn { font-size: 8px !important; }
+    table.print-forn th:nth-child(1), table.print-forn td:nth-child(1) { width: 8% !important; text-align: center !important; }
+    table.print-forn th:nth-child(2), table.print-forn td:nth-child(2) { width: 36% !important; text-align: left !important; }
     table.print-forn th:nth-child(n+3):nth-child(-n+10),
-    table.print-forn td:nth-child(n+3):nth-child(-n+10) { width: 6.5% !important; text-align: center !important; }
-    table.print-forn th:nth-child(11), table.print-forn td:nth-child(11) {
-        width: 8% !important; text-align: center !important;
-        font-weight: bold !important; background-color: #eeeeee !important;
-        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
-    }
+    table.print-forn td:nth-child(n+3):nth-child(-n+10) { width: 7% !important; text-align: center !important; }
 
     table.print-sep { font-size: 9px !important; }
-    table.print-sep th:nth-child(1), table.print-sep td:nth-child(1) { width: 11% !important; text-align: left !important; }
-    table.print-sep th:nth-child(2), table.print-sep td:nth-child(2) { width: 7%  !important; text-align: center !important; }
-    table.print-sep th:nth-child(3), table.print-sep td:nth-child(3) { width: 26% !important; text-align: left !important; }
+    table.print-sep th:nth-child(1), table.print-sep td:nth-child(1) { width: 14% !important; text-align: left !important; }
+    table.print-sep th:nth-child(2), table.print-sep td:nth-child(2) { width: 6%  !important; text-align: center !important; }
+    table.print-sep th:nth-child(3), table.print-sep td:nth-child(3) { width: 24% !important; text-align: left !important; }
     table.print-sep th:nth-child(n+4):nth-child(-n+11),
-    table.print-sep td:nth-child(n+4):nth-child(-n+11) { width: 6% !important; text-align: center !important; }
-    table.print-sep th:nth-child(12), table.print-sep td:nth-child(12) {
-        width: 7% !important; text-align: center !important;
-        font-weight: bold !important; background-color: #eeeeee !important;
-        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
-    }
+    table.print-sep td:nth-child(n+4):nth-child(-n+11) { width: 7% !important; text-align: center !important; }
 }
 
 @media screen {
@@ -603,7 +593,7 @@ def carregar_pedidos():
     if df_pedidos.empty or "Código" not in df_pedidos.columns:
         df_init = df_cat[["Fornecedor", "Código", "Descrição"]].copy()
         for loja in LOJAS:
-            df_init[loja] = "0"
+            df_init[loja] = "" # Substituindo o 0 por vazio na criação
         if not df_init.empty:
             conn.update(worksheet=WS_PEDIDOS, data=df_init)
         return df_init
@@ -616,10 +606,10 @@ def carregar_pedidos():
 
     for loja in LOJAS:
         if loja in df_pedidos.columns:
-            # Transformado para string para segurar as letras digitadas pelas lojas
-            df_pedidos[loja] = df_pedidos[loja].fillna("0").astype(str)
+            # Substitui "0" ou "0.0" por vazio ("") para não ficar visualmente poluído
+            df_pedidos[loja] = df_pedidos[loja].fillna("").astype(str).apply(lambda x: "" if str(x).strip() in ["0", "0.0", "0,0"] else x)
         else:
-            df_pedidos[loja] = "0"
+            df_pedidos[loja] = ""
 
     return df_pedidos
 
@@ -758,7 +748,7 @@ def modal_zerar_pedidos():
             df_main = carregar_pedidos()
             for loja in LOJAS:
                 if loja in df_main.columns:
-                    df_main[loja] = "0"
+                    df_main[loja] = "" # Substituindo o 0 por vazio
             salvar_pedidos(df_main)
             st.rerun()
 
@@ -783,21 +773,16 @@ if perfil_navegacao == "Separação e Fechamento":
             st.warning("A base de pedidos está vazia. Cadastre produtos no Catálogo primeiro.")
             st.stop()
 
-        # Cria uma cópia com apenas valores numéricos usando .map para somar o Total Geral
-        df_num = df_base[LOJAS].map(extrair_numero_quantidade)
-        df_base["TOTAL GERAL"] = df_num.sum(axis=1)
-
         col_cfg = {
             "Fornecedor":  st.column_config.TextColumn("Categoria", disabled=True),
             "Código":      st.column_config.NumberColumn("Cód.", width=80, format="%d", disabled=True),
             "Descrição":   st.column_config.TextColumn("Produto", disabled=True),
-            "TOTAL GERAL": st.column_config.NumberColumn("TOTAL ▶️", width=90, format="%d", disabled=True),
         }
         # As colunas de lojas agora são TextColumn para permitirem letras e números
         for loja, novo_nome in MAPA_LOJAS.items():
             col_cfg[loja] = st.column_config.TextColumn(novo_nome)
 
-        cols_order = ["Fornecedor", "Código", "Descrição"] + LOJAS + ["TOTAL GERAL"]
+        cols_order = ["Fornecedor", "Código", "Descrição"] + LOJAS
         df_exibir = df_base[cols_order]
 
         df_editado = st.data_editor(
@@ -913,7 +898,7 @@ elif perfil_navegacao == "Visão das Lojas":
     )
     
     # Mantém como texto para a loja poder digitar cx, und, etc.
-    df_loja_view[loja_selecionada] = df_loja_view[loja_selecionada].fillna("0").astype(str)
+    df_loja_view[loja_selecionada] = df_loja_view[loja_selecionada].fillna("").astype(str)
     df_loja_view = df_loja_view.rename(columns={loja_selecionada: "Qtde"})
 
     try:
@@ -1022,7 +1007,7 @@ elif perfil_navegacao == "Visão das Lojas":
                         df_main.loc[mask, loja_selecionada] = str(row["Qtde"])
                     else:
                         nova_linha = {"Fornecedor": row["Fornecedor"], "Código": row["Código"], "Descrição": row["Descrição"]}
-                        for l in LOJAS: nova_linha[l] = "0"
+                        for l in LOJAS: nova_linha[l] = ""
                         nova_linha[loja_selecionada] = str(row["Qtde"])
                         df_main = pd.concat([df_main, pd.DataFrame([nova_linha])], ignore_index=True)
 
@@ -1062,10 +1047,6 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
             colunas_presentes = LOJAS
             df_forn = df_forn[["Código", "Descrição"] + colunas_presentes].copy()
             
-            # Para somar, usamos a função de limpar texto na hora usando .map do pandas novo
-            df_forn_nums = df_forn[colunas_presentes].map(extrair_numero_quantidade)
-            df_forn["TOTAL"] = df_forn_nums.sum(axis=1)
-
             lojas_renomeadas = {l: MAPA_LOJAS[l] for l in colunas_presentes}
             df_forn = df_forn.rename(columns=lojas_renomeadas)
 
@@ -1074,7 +1055,6 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
             col_cfg_forn = {
                 "Código":    st.column_config.NumberColumn("Cód.", width=80, format="%d", disabled=True),
                 "Descrição": st.column_config.TextColumn("Produto", disabled=False),
-                "TOTAL":     st.column_config.NumberColumn("TOTAL", format="%d", disabled=True),
             }
             # Lojas como texto para ver as caixas e unidades
             for c in lojas_cols_renomeadas:
@@ -1093,7 +1073,7 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
                     )
                     st.markdown('</div>', unsafe_allow_html=True)
 
-                    cols_order_forn = ["Código", "Descrição"] + lojas_cols_renomeadas + ["TOTAL"]
+                    cols_order_forn = ["Código", "Descrição"] + lojas_cols_renomeadas
                     df_forn_edit = st.data_editor(
                         df_forn[cols_order_forn],
                         hide_index=True,
@@ -1104,7 +1084,10 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
                         key=f"forn_materia_prima_{fornecedor}_{st.session_state['reset_counter_materia_prima']}"
                     )
 
-                    total_geral = int(df_forn_edit["TOTAL"].sum()) if "TOTAL" in df_forn_edit.columns else 0
+                    # Calcula total da categoria só para exibir no cantinho e na impressão
+                    df_forn_nums = df_forn[lojas_cols_renomeadas].map(extrair_numero_quantidade)
+                    total_geral = int(df_forn_nums.sum().sum())
+                    
                     st.markdown(f"""
                         <div style="text-align:right; font-weight:700; margin-top:6px; color:var(--brown-bright); font-size:15px;">
                             Total Geral: {total_geral} unidades
@@ -1149,9 +1132,8 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
             df_export = pd.concat([df_export, df_f], ignore_index=True)
             
     if not df_export.empty:
-        df_export = df_export[["Código", "Descrição", "Fornecedor"] + LOJAS]
-        df_export_nums = df_export[LOJAS].map(extrair_numero_quantidade)
-        df_export["TOTAL GERAL"] = df_export_nums.sum(axis=1)
+        cols_final_export = ["Código", "Descrição", "Fornecedor"] + LOJAS
+        df_export = df_export[cols_final_export]
         df_export = df_export.rename(columns=MAPA_LOJAS)
 
     with col_csv:
