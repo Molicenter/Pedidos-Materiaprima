@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import io
+import re
 import streamlit.components.v1 as components
 from streamlit_gsheets import GSheetsConnection
 
@@ -269,6 +270,22 @@ div[data-testid="stVerticalBlockBorderWrapper"]:hover {
 }
 </style>
 """, unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────
+# FUNÇÃO PARA EXTRAIR APENAS NÚMEROS (TRATAR CX, UND, KG)
+# ─────────────────────────────────────────────
+def extrair_numero_quantidade(valor):
+    """
+    Tenta converter o valor para número ignorando textos (ex: '01 cx' -> 1).
+    Se o valor for vazio, puramente texto ou erro, retorna 0.
+    """
+    if pd.isna(valor) or valor == "":
+        return 0
+    v_str = str(valor)
+    match = re.search(r'\d+', v_str)
+    if match:
+        return int(match.group())
+    return 0
 
 # ─────────────────────────────────────────────
 # CONSTANTES E PRODUTOS INICIAIS DA MATRIZ
@@ -586,7 +603,7 @@ def carregar_pedidos():
     if df_pedidos.empty or "Código" not in df_pedidos.columns:
         df_init = df_cat[["Fornecedor", "Código", "Descrição"]].copy()
         for loja in LOJAS:
-            df_init[loja] = 0
+            df_init[loja] = "0"
         if not df_init.empty:
             conn.update(worksheet=WS_PEDIDOS, data=df_init)
         return df_init
@@ -599,7 +616,10 @@ def carregar_pedidos():
 
     for loja in LOJAS:
         if loja in df_pedidos.columns:
-            df_pedidos[loja] = pd.to_numeric(df_pedidos[loja], errors='coerce').fillna(0).astype(int)
+            # Transformado para string para segurar as letras digitadas pelas lojas
+            df_pedidos[loja] = df_pedidos[loja].fillna("0").astype(str)
+        else:
+            df_pedidos[loja] = "0"
 
     return df_pedidos
 
@@ -698,7 +718,9 @@ with st.sidebar:
 
     df_ped = carregar_pedidos()
     if not df_ped.empty and set(LOJAS).issubset(df_ped.columns):
-        total_preenchidos = (df_ped[LOJAS] > 0).any(axis=1).sum()
+        # Transforma tudo para numero (limpando letras) usando .map do pandas novo
+        temp_sum = df_ped[LOJAS].map(extrair_numero_quantidade)
+        total_preenchidos = (temp_sum > 0).any(axis=1).sum()
     else:
         total_preenchidos = 0
 
@@ -736,7 +758,7 @@ def modal_zerar_pedidos():
             df_main = carregar_pedidos()
             for loja in LOJAS:
                 if loja in df_main.columns:
-                    df_main[loja] = 0
+                    df_main[loja] = "0"
             salvar_pedidos(df_main)
             st.rerun()
 
@@ -761,7 +783,9 @@ if perfil_navegacao == "Separação e Fechamento":
             st.warning("A base de pedidos está vazia. Cadastre produtos no Catálogo primeiro.")
             st.stop()
 
-        df_base["TOTAL GERAL"] = df_base[LOJAS].sum(axis=1)
+        # Cria uma cópia com apenas valores numéricos usando .map para somar o Total Geral
+        df_num = df_base[LOJAS].map(extrair_numero_quantidade)
+        df_base["TOTAL GERAL"] = df_num.sum(axis=1)
 
         col_cfg = {
             "Fornecedor":  st.column_config.TextColumn("Categoria", disabled=True),
@@ -769,8 +793,9 @@ if perfil_navegacao == "Separação e Fechamento":
             "Descrição":   st.column_config.TextColumn("Produto", disabled=True),
             "TOTAL GERAL": st.column_config.NumberColumn("TOTAL ▶️", width=90, format="%d", disabled=True),
         }
+        # As colunas de lojas agora são TextColumn para permitirem letras e números
         for loja, novo_nome in MAPA_LOJAS.items():
-            col_cfg[loja] = st.column_config.NumberColumn(novo_nome, format="%d", min_value=0, step=1)
+            col_cfg[loja] = st.column_config.TextColumn(novo_nome)
 
         cols_order = ["Fornecedor", "Código", "Descrição"] + LOJAS + ["TOTAL GERAL"]
         df_exibir = df_base[cols_order]
@@ -799,7 +824,13 @@ if perfil_navegacao == "Separação e Fechamento":
 
         with col_salvar:
             if st.button("💾 Salvar Alterações", type="primary", use_container_width=True):
-                df_to_save = df_editado.drop(columns=["TOTAL GERAL"])
+                df_to_save = carregar_pedidos()
+                for _, row_edit in df_editado.iterrows():
+                    mask = (df_to_save["Fornecedor"] == row_edit["Fornecedor"]) & (df_to_save["Código"] == row_edit["Código"])
+                    for loja in LOJAS:
+                        # Salva o texto que foi alterado pelo admin
+                        df_to_save.loc[mask, loja] = str(row_edit[loja])
+                        
                 salvar_pedidos(df_to_save)
                 st.success("✅ Pedidos salvos na nuvem com sucesso!")
                 st.rerun()
@@ -880,7 +911,9 @@ elif perfil_navegacao == "Visão das Lojas":
         on=["Fornecedor", "Código"],
         how="left"
     )
-    df_loja_view[loja_selecionada] = df_loja_view[loja_selecionada].fillna(0).astype(int)
+    
+    # Mantém como texto para a loja poder digitar cx, und, etc.
+    df_loja_view[loja_selecionada] = df_loja_view[loja_selecionada].fillna("0").astype(str)
     df_loja_view = df_loja_view.rename(columns={loja_selecionada: "Qtde"})
 
     try:
@@ -919,7 +952,6 @@ elif perfil_navegacao == "Visão das Lojas":
         df_loja_view["Estoque"] = 0
 
     df_loja_view["Estoque"] = df_loja_view["Estoque"].fillna(0).astype(int)
-    df_loja_view["Qtde"] = df_loja_view["Qtde"].fillna(0).astype(int)
     df_loja_view = df_loja_view[["Fornecedor", "Código", "Descrição", "Estoque", "Qtde"]]
 
     with st.container(border=True):
@@ -930,7 +962,8 @@ elif perfil_navegacao == "Visão das Lojas":
             "Código":     st.column_config.NumberColumn("Cód.", width=80, format="%d", disabled=True),
             "Descrição":  st.column_config.TextColumn("Produto", width=250, disabled=True),
             "Estoque":    st.column_config.NumberColumn("📦 Estoque", width=100, format="%d", disabled=True),
-            "Qtde":       st.column_config.NumberColumn("🛒 Qtde", width=120, min_value=0, step=1),
+            # Transformada em TextColumn para aceitar letras e números
+            "Qtde":       st.column_config.TextColumn("🛒 Qtde", width=120),
         }
 
         with st.container():
@@ -956,9 +989,11 @@ elif perfil_navegacao == "Visão das Lojas":
 </div>
 </div>""", unsafe_allow_html=True)
 
-        itens_com_pedido = int((df_editado["Qtde"] > 0).sum())
+        # Na hora de calcular os totais de cobertura, limpamos as letras e usamos os números
+        df_editado_nums = df_editado["Qtde"].map(extrair_numero_quantidade)
+        itens_com_pedido = int((df_editado_nums > 0).sum())
         total_itens      = len(df_editado)
-        total_unidades   = int(df_editado["Qtde"].sum())
+        total_unidades   = int(df_editado_nums.sum())
         pct              = round(itens_com_pedido / total_itens * 100) if total_itens else 0
 
         st.divider()
@@ -983,11 +1018,12 @@ elif perfil_navegacao == "Visão das Lojas":
                         (df_main["Código"] == row["Código"])
                     )
                     if mask.any():
-                        df_main.loc[mask, loja_selecionada] = row["Qtde"]
+                        # Salva como string na nuvem
+                        df_main.loc[mask, loja_selecionada] = str(row["Qtde"])
                     else:
                         nova_linha = {"Fornecedor": row["Fornecedor"], "Código": row["Código"], "Descrição": row["Descrição"]}
-                        for l in LOJAS: nova_linha[l] = 0
-                        nova_linha[loja_selecionada] = row["Qtde"]
+                        for l in LOJAS: nova_linha[l] = "0"
+                        nova_linha[loja_selecionada] = str(row["Qtde"])
                         df_main = pd.concat([df_main, pd.DataFrame([nova_linha])], ignore_index=True)
 
                 salvar_pedidos(df_main)
@@ -1025,7 +1061,10 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
             df_forn = df_all[df_all["Fornecedor"] == fornecedor].copy()
             colunas_presentes = LOJAS
             df_forn = df_forn[["Código", "Descrição"] + colunas_presentes].copy()
-            df_forn["TOTAL"] = df_forn[colunas_presentes].sum(axis=1)
+            
+            # Para somar, usamos a função de limpar texto na hora usando .map do pandas novo
+            df_forn_nums = df_forn[colunas_presentes].map(extrair_numero_quantidade)
+            df_forn["TOTAL"] = df_forn_nums.sum(axis=1)
 
             lojas_renomeadas = {l: MAPA_LOJAS[l] for l in colunas_presentes}
             df_forn = df_forn.rename(columns=lojas_renomeadas)
@@ -1037,8 +1076,9 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
                 "Descrição": st.column_config.TextColumn("Produto", disabled=False),
                 "TOTAL":     st.column_config.NumberColumn("TOTAL", format="%d", disabled=True),
             }
+            # Lojas como texto para ver as caixas e unidades
             for c in lojas_cols_renomeadas:
-                col_cfg_forn[c] = st.column_config.NumberColumn(c, format="%d", disabled=False, min_value=0)
+                col_cfg_forn[c] = st.column_config.TextColumn(c, disabled=False)
 
             altura = (len(df_forn) * 35) + 42
 
@@ -1110,7 +1150,8 @@ elif perfil_navegacao == "Visão por Fornecedor (Resumo)":
             
     if not df_export.empty:
         df_export = df_export[["Código", "Descrição", "Fornecedor"] + LOJAS]
-        df_export["TOTAL GERAL"] = df_export[LOJAS].sum(axis=1)
+        df_export_nums = df_export[LOJAS].map(extrair_numero_quantidade)
+        df_export["TOTAL GERAL"] = df_export_nums.sum(axis=1)
         df_export = df_export.rename(columns=MAPA_LOJAS)
 
     with col_csv:
